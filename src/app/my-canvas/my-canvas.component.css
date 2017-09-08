@@ -1,0 +1,12 @@
+:host {
+  background-color: rgb(193, 252, 255);
+  width: 100%;
+  padding: 30px;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  border: 3px solid #000000;
+  background-color: rgb(180, 240, 199);
+}
