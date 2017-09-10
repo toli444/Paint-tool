@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {el} from "@angular/platform-browser/testing/src/browser_util";
-declare var $: any;
+declare const $: any;
 
 @Component({
   selector: 'app-my-canvas',
@@ -10,14 +10,19 @@ declare var $: any;
 export class MyCanvasComponent implements OnInit {
   @ViewChild('myCanvas') canvasRef: ElementRef;
 
+  ctx;
+  firstClick = true;
+  firstPoint = {
+    x: 0,
+    y: 0
+  };
   constructor() { }
 
   ngOnInit() {
-    const ctx: CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
-    const $canvas = $('#myCanvas');
-
-    ctx.canvas.width = $canvas.width();
-    ctx.canvas.height = $canvas.height();
+    this.ctx = CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
+    // const $canvas = $('#myCanvas');
+    // this.ctx.canvas.height = $canvas.width();
+    // this.ctx.canvas.width = $canvas.height();
     const firstPoint = {
       x: 100,
       y: 100
@@ -26,23 +31,33 @@ export class MyCanvasComponent implements OnInit {
       x: 200,
       y: 200
     };
-    const differenceX = secondPoint.x - firstPoint.x;
-    const differenceY = secondPoint.y - firstPoint.y;
-    let steps;
+    this.drawLineDDA({x: 0, y: 0}, {x: 200, y: 200});
+  }
 
-    if (Math.abs(differenceX) > Math.abs(differenceY)) {
-      steps = Math.abs(differenceX);
+  onClick($event) {
+    if (this.firstClick) {
+      this.firstPoint.x = $event.offsetX;
+      this.firstPoint.y = $event.offsetY;
+      this.ctx.clearRect(0, 0, this.ctx.width, this.ctx.height);
+      this.firstClick = false;
     } else {
-      steps = Math.abs(differenceY);
+      this.drawLineDDA({x: this.firstPoint.x, y: this.firstPoint.y}, {x: $event.offsetX, y: $event.offsetY});
+      this.firstClick = true;
     }
+  }
+  drawLineDDA(firstPoint, secondPoint) {
+    const steps = Math.max(Math.abs(secondPoint.x - firstPoint.x), Math.abs(secondPoint.y - firstPoint.y));
+    const differenceX = (secondPoint.x - firstPoint.x) / steps;
+    const differenceY = (secondPoint.y - firstPoint.y) / steps;
 
-    const incrementX = differenceX / steps;
-    const incrementY = differenceY / steps;
+    let x = firstPoint.x;
+    let y = firstPoint.y;
+    this.ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
 
-    for (let i = 0; i < steps; i++) {
-      let x = x + Xincrement;
-      y = y + Yincrement;
-      putpixel(Round(x), Round(y));
+    for (let i = 0; i <= steps; i++) {
+      x += differenceX;
+      y += differenceY;
+      this.ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
     }
   }
 }
