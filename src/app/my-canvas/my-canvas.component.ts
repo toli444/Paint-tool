@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {el} from "@angular/platform-browser/testing/src/browser_util";
 declare const $: any;
 
@@ -8,10 +8,9 @@ declare const $: any;
   styleUrls: ['./my-canvas.component.css']
 })
 export class MyCanvasComponent implements OnInit {
+  @Input() canvasCtx;
   @ViewChild('myCanvas') canvasRef: ElementRef;
-
-  ctx;
-  firstClick = true;
+  drawStarted = false;
   firstPoint = {
     x: 0,
     y: 0
@@ -19,30 +18,23 @@ export class MyCanvasComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.ctx = CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
-    // const $canvas = $('#myCanvas');
-    // this.ctx.canvas.height = $canvas.width();
-    // this.ctx.canvas.width = $canvas.height();
-    const firstPoint = {
-      x: 100,
-      y: 100
-    };
-    const secondPoint = {
-      x: 200,
-      y: 200
-    };
-    this.drawLineDDA({x: 0, y: 0}, {x: 200, y: 200});
+    this.canvasCtx = CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext('2d');
   }
 
   onClick($event) {
-    if (this.firstClick) {
+    if (!this.drawStarted) {
       this.firstPoint.x = $event.offsetX;
       this.firstPoint.y = $event.offsetY;
-      this.ctx.clearRect(0, 0, this.ctx.width, this.ctx.height);
-      this.firstClick = false;
+      this.clearCanvas();
+      this.drawStarted = true;
     } else {
+      this.drawStarted = false;
+    }
+  }
+  mouseMove($event) {
+    if (this.drawStarted) {
+      this.clearCanvas();
       this.drawLineDDA({x: this.firstPoint.x, y: this.firstPoint.y}, {x: $event.offsetX, y: $event.offsetY});
-      this.firstClick = true;
     }
   }
   drawLineDDA(firstPoint, secondPoint) {
@@ -52,12 +44,19 @@ export class MyCanvasComponent implements OnInit {
 
     let x = firstPoint.x;
     let y = firstPoint.y;
-    this.ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+    this.canvasCtx.fillRect(Math.round(x), Math.round(y), 1, 1);
 
     for (let i = 0; i <= steps; i++) {
       x += differenceX;
       y += differenceY;
-      this.ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+      this.canvasCtx.fillRect(Math.round(x), Math.round(y), 1, 1);
     }
+  }
+  clearCanvas() {
+    this.canvasCtx.clearRect(0, 0, this.canvasCtx.canvas.width, this.canvasCtx.canvas.height);
+  }
+  setScale(scale) {
+    debugger;
+    this.canvasCtx.scale(scale, scale);
   }
 }

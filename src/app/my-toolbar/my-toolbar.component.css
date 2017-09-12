@@ -4,3 +4,9 @@
   background: rgb(255, 255, 255);
   border-right: 3px solid black;
 }
+
+.icon {
+  border-top: 3px solid black;
+  border-bottom: 3px solid black;
+  height: 100px;
+}
